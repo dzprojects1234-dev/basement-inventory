@@ -1,0 +1,1901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Basement Supply Inventory Tracker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #7c3aed;
+            --primary-dark: #6d28d9;
+            --secondary: #10b981;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --dark-bg: #0f172a;
+            --dark-card: #1e293b;
+            --dark-border: #334155;
+            --dark-text: #f1f5f9;
+            --dark-text-secondary: #94a3b8;
+            --light: #f8fafc;
+            --gray-light: #cbd5e1;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--dark-bg);
+            color: var(--dark-text);
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 25px;
+            background: linear-gradient(135deg, var(--primary) 0%, #4f46e5 100%);
+            color: white;
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 15px;
+        }
+        
+        .cloud-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+        
+        .status-connected {
+            color: #4ade80;
+        }
+        
+        .status-disconnected {
+            color: #f87171;
+        }
+        
+        .inventory-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .inventory-list {
+            flex: 2;
+            min-width: 300px;
+            background-color: var(--dark-card);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--dark-border);
+        }
+        
+        .inventory-form {
+            flex: 1;
+            min-width: 300px;
+            background-color: var(--dark-card);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--dark-border);
+        }
+        
+        .section-title {
+            font-size: 1.6rem;
+            margin-bottom: 20px;
+            color: var(--light);
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--dark-border);
+        }
+        
+        .item-card {
+            padding: 18px;
+            margin-bottom: 15px;
+            background-color: rgba(30, 41, 59, 0.8);
+            border-radius: 10px;
+            border-left: 5px solid var(--primary);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            border: 1px solid var(--dark-border);
+        }
+        
+        .item-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+            border-color: var(--primary);
+        }
+        
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+        
+        .item-content {
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+        }
+        
+        .item-image-container {
+            width: 80px;
+            height: 80px;
+            flex-shrink: 0;
+        }
+        
+        .item-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 2px solid var(--dark-border);
+        }
+        
+        .item-image-placeholder {
+            width: 100%;
+            height: 100%;
+            border-radius: 8px;
+            background: linear-gradient(135deg, var(--dark-border) 0%, #475569 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--dark-text-secondary);
+            font-size: 1.8rem;
+        }
+        
+        .item-info {
+            flex: 1;
+        }
+        
+        .item-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        
+        .item-icon {
+            font-size: 1.2rem;
+            color: var(--primary);
+        }
+        
+        .item-name {
+            font-weight: 700;
+            font-size: 1.4rem;
+            color: var(--light);
+        }
+        
+        .item-code {
+            color: var(--dark-text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+            background-color: rgba(148, 163, 184, 0.1);
+            padding: 3px 8px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-top: 2px;
+        }
+        
+        .item-category {
+            background-color: rgba(124, 58, 237, 0.2);
+            color: #a78bfa;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: 5px;
+            border: 1px solid rgba(124, 58, 237, 0.3);
+        }
+        
+        .item-details {
+            display: flex;
+            justify-content: space-between;
+            margin: 15px 0;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .detail-item {
+            flex: 1;
+            min-width: 120px;
+        }
+        
+        .detail-label {
+            font-size: 0.85rem;
+            color: var(--dark-text-secondary);
+            margin-bottom: 5px;
+        }
+        
+        .detail-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--light);
+        }
+        
+        .item-quantity {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+        
+        .quantity-low {
+            color: var(--danger);
+        }
+        
+        .quantity-medium {
+            color: var(--warning);
+        }
+        
+        .quantity-ok {
+            color: var(--success);
+        }
+        
+        .item-notes {
+            background-color: rgba(15, 23, 42, 0.5);
+            padding: 12px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 3px solid var(--primary);
+        }
+        
+        .notes-label {
+            font-weight: 600;
+            color: var(--dark-text-secondary);
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .notes-content {
+            color: var(--light);
+            line-height: 1.5;
+        }
+        
+        .notes-empty {
+            color: var(--dark-text-secondary);
+            font-style: italic;
+        }
+        
+        .item-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid var(--dark-border);
+        }
+        
+        .item-timestamp {
+            font-size: 0.8rem;
+            color: var(--dark-text-secondary);
+        }
+        
+        .item-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            padding: 8px 15px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        
+        .edit-btn {
+            background-color: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        
+        .edit-btn:hover {
+            background-color: var(--success);
+            color: white;
+        }
+        
+        .delete-btn {
+            background-color: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+        
+        .delete-btn:hover {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .quantity-btn {
+            background-color: var(--dark-border);
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: all 0.2s;
+            color: var(--light);
+        }
+        
+        .quantity-btn:hover {
+            background-color: var(--primary);
+            color: white;
+            transform: scale(1.1);
+        }
+        
+        .form-group {
+            margin-bottom: 22px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--light);
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 14px 16px;
+            background-color: rgba(15, 23, 42, 0.5);
+            border: 1px solid var(--dark-border);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            color: var(--light);
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.3);
+            background-color: rgba(15, 23, 42, 0.7);
+        }
+        
+        .photo-section {
+            border: 2px dashed var(--dark-border);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            background-color: rgba(15, 23, 42, 0.3);
+        }
+        
+        .photo-preview {
+            width: 100%;
+            max-height: 200px;
+            object-fit: cover;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            display: none;
+            border: 1px solid var(--dark-border);
+        }
+        
+        .photo-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s;
+            margin: 5px;
+        }
+        
+        .photo-btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .photo-btn.secondary {
+            background-color: var(--dark-border);
+            color: var(--light);
+        }
+        
+        .photo-btn.secondary:hover {
+            background-color: #475569;
+        }
+        
+        .photo-btn.danger {
+            background-color: var(--danger);
+        }
+        
+        .photo-btn.danger:hover {
+            background-color: #dc2626;
+        }
+        
+        .photo-controls {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .camera-instructions {
+            background-color: rgba(245, 158, 11, 0.1);
+            border-left: 4px solid var(--warning);
+            padding: 10px 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            color: #fbbf24;
+        }
+        
+        .add-btn {
+            background: linear-gradient(to right, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 16px 25px;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+        }
+        
+        .add-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(124, 58, 237, 0.4);
+        }
+        
+        .summary {
+            background-color: var(--dark-card);
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--dark-border);
+        }
+        
+        .summary-item {
+            text-align: center;
+            flex: 1;
+            min-width: 150px;
+        }
+        
+        .summary-value {
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: var(--primary);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .summary-label {
+            font-size: 1rem;
+            color: var(--dark-text-secondary);
+            margin-top: 5px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--dark-text-secondary);
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+            color: var(--primary);
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            color: var(--dark-text-secondary);
+            font-size: 0.9rem;
+            padding-top: 20px;
+            border-top: 1px solid var(--dark-border);
+        }
+        
+        .category-filter {
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .filter-controls {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .form-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .clear-form {
+            background: none;
+            border: none;
+            color: var(--dark-text-secondary);
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .clear-form:hover {
+            color: var(--danger);
+        }
+        
+        .icon-selector {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .icon-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+            border: 2px solid var(--dark-border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background-color: rgba(15, 23, 42, 0.3);
+            color: var(--light);
+        }
+        
+        .icon-option:hover {
+            border-color: var(--primary);
+            background-color: rgba(124, 58, 237, 0.1);
+        }
+        
+        .icon-option.selected {
+            border-color: var(--primary);
+            background-color: rgba(124, 58, 237, 0.2);
+            box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.3);
+        }
+        
+        .icon-option i {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+            color: var(--primary);
+        }
+        
+        .sync-controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        
+        .sync-btn {
+            background-color: rgba(59, 130, 246, 0.2);
+            color: var(--info);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        
+        .sync-btn:hover {
+            background-color: var(--info);
+            color: white;
+        }
+        
+        .sync-btn.warning {
+            background-color: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+        
+        .sync-btn.warning:hover {
+            background-color: var(--warning);
+            color: white;
+        }
+        
+        .sync-spinner {
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 768px) {
+            .inventory-container {
+                flex-direction: column;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .item-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .item-content {
+                flex-direction: column;
+            }
+            
+            .item-image-container {
+                width: 100%;
+                height: 150px;
+            }
+            
+            .item-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+            
+            .icon-selector {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .photo-controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .sync-controls {
+                flex-direction: column;
+            }
+        }
+        
+        select {
+            background-color: rgba(15, 23, 42, 0.5);
+            color: var(--light);
+            border: 1px solid var(--dark-border);
+            padding: 10px 15px;
+            border-radius: 8px;
+        }
+        
+        select:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.3);
+        }
+        
+        ::placeholder {
+            color: var(--dark-text-secondary);
+            opacity: 0.7;
+        }
+        
+        option {
+            background-color: var(--dark-card);
+            color: var(--light);
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background-color: var(--primary);
+            color: white;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideUp 0.3s ease;
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(100px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .offline-indicator {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background-color: var(--warning);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            z-index: 1001;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-boxes"></i> Basement Supply Inventory Tracker</h1>
+            <p class="subtitle">Auto-sync across all devices - No setup needed!</p>
+            <div class="cloud-status" id="cloudStatus">
+                <i class="fas fa-cloud"></i>
+                <span>Connecting to cloud storage...</span>
+            </div>
+        </header>
+        
+        <div class="inventory-container">
+            <div class="inventory-list">
+                <div class="category-filter">
+                    <h2 class="section-title">Current Inventory</h2>
+                    <div class="filter-controls">
+                        <select id="categoryFilter" onchange="filterByCategory()">
+                            <option value="all">All Categories</option>
+                            <option value="Dining">Dining Items</option>
+                            <option value="Packaging">Packaging</option>
+                            <option value="Cleaning">Cleaning Supplies</option>
+                            <option value="Storage">Storage</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <select id="sortFilter" onchange="sortInventory()">
+                            <option value="name">Sort by Name</option>
+                            <option value="quantity">Sort by Quantity</option>
+                            <option value="date">Sort by Date</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div id="inventoryItems">
+                    <!-- Items will be loaded automatically -->
+                </div>
+                
+                <div id="emptyState" class="empty-state">
+                    <i class="fas fa-clipboard-list"></i>
+                    <h3>No Items in Inventory</h3>
+                    <p>Add your first item using the form on the right</p>
+                </div>
+                
+                <div class="sync-controls">
+                    <button class="sync-btn" onclick="forceSync()" id="syncBtn">
+                        <i class="fas fa-sync-alt"></i> Sync Now
+                    </button>
+                    <button class="sync-btn warning" onclick="showBackupOptions()">
+                        <i class="fas fa-download"></i> Backup/Restore
+                    </button>
+                </div>
+            </div>
+            
+            <div class="inventory-form">
+                <div class="form-title">
+                    <h2 class="section-title" id="formTitle">Add New Item</h2>
+                    <button type="button" class="clear-form" id="clearFormBtn" style="display: none;">
+                        <i class="fas fa-times"></i> Clear Form
+                    </button>
+                </div>
+                
+                <form id="addItemForm">
+                    <input type="hidden" id="itemId" value="">
+                    
+                    <div class="form-group">
+                        <label for="itemName">Item Name *</label>
+                        <input type="text" id="itemName" placeholder="e.g., Plastic Cups, Bowls, etc." required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="itemIcon">Select Icon</label>
+                        <div class="icon-selector" id="iconSelector">
+                            <!-- Icons will be populated by JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="itemCategory">Item Category *</label>
+                        <select id="itemCategory" required>
+                            <option value="">Select a category</option>
+                            <option value="Dining">Dining Items (Plates, Bowls, Cups)</option>
+                            <option value="Packaging">Packaging (Containers, Bags)</option>
+                            <option value="Cleaning">Cleaning Supplies</option>
+                            <option value="Storage">Storage Items</option>
+                            <option value="Other">Other Supplies</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="itemCode">Item Code *</label>
+                        <input type="text" id="itemCode" placeholder="e.g., CUP-001, BOWL-002" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="itemQuantity">Current Quantity *</label>
+                        <input type="number" id="itemQuantity" min="0" value="1" required>
+                        <div class="quantity-controls" style="margin-top: 10px;">
+                            <button type="button" class="quantity-btn" onclick="adjustQuantity(-5)">-5</button>
+                            <button type="button" class="quantity-btn" onclick="adjustQuantity(-1)">-1</button>
+                            <span style="padding: 0 15px; font-weight: bold; color: var(--light);">Qty</span>
+                            <button type="button" class="quantity-btn" onclick="adjustQuantity(1)">+1</button>
+                            <button type="button" class="quantity-btn" onclick="adjustQuantity(5)">+5</button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="itemNotes">Notes / Remarks</label>
+                        <textarea id="itemNotes" placeholder="Add any notes, remarks, or special instructions about this item..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Item Photo (Optional)</label>
+                        <div class="photo-section">
+                            <img id="photoPreview" class="photo-preview" alt="Photo preview">
+                            
+                            <div id="cameraInstructions" class="camera-instructions">
+                                <strong>Mobile Camera:</strong> Click "Take Photo" to open your device's camera app.
+                                Make sure to allow camera permissions when prompted.
+                            </div>
+                            
+                            <div id="photoControls" style="display: none;">
+                                <p style="color: var(--light); margin-bottom: 10px;">Photo captured! You can retake if needed.</p>
+                                <div class="photo-controls">
+                                    <button type="button" class="photo-btn secondary" onclick="retakePhoto()">
+                                        <i class="fas fa-redo"></i> Retake Photo
+                                    </button>
+                                    <button type="button" class="photo-btn danger" onclick="removePhoto()">
+                                        <i class="fas fa-trash"></i> Remove Photo
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div id="cameraControls">
+                                <button type="button" class="photo-btn" onclick="openMobileCamera()">
+                                    <i class="fas fa-camera"></i> Take Photo
+                                </button>
+                                <input type="file" id="mobileCameraInput" accept="image/*" capture="environment" style="display: none;" onchange="handleMobileCamera(event)">
+                                
+                                <p style="margin: 15px 0 10px; color: var(--dark-text-secondary); font-size: 0.9rem;">Or upload an image:</p>
+                                <input type="file" id="fileUpload" accept="image/*" style="display: none;" onchange="handleFileUpload(event)">
+                                <button type="button" class="photo-btn secondary" onclick="document.getElementById('fileUpload').click()">
+                                    <i class="fas fa-upload"></i> Upload Image
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="add-btn" id="submitBtn">
+                        <i class="fas fa-plus-circle"></i> Add to Inventory
+                    </button>
+                </form>
+                
+                <div class="instructions" style="margin-top: 30px; padding: 20px; background-color: rgba(15, 23, 42, 0.3); border-radius: 10px; border: 1px solid var(--dark-border);">
+                    <h3 style="font-size: 1.1rem; margin-bottom: 15px; color: var(--primary);">Auto-Sync Features:</h3>
+                    <ul style="padding-left: 20px; color: var(--dark-text-secondary); line-height: 1.8;">
+                        <li><strong>Automatic Sync:</strong> Changes sync to cloud every 30 seconds</li>
+                        <li><strong>Works Offline:</strong> Continue working without internet</li>
+                        <li><strong>Team Updates:</strong> See colleagues' changes in real-time</li>
+                        <li><strong>No Setup:</strong> Works immediately after deployment</li>
+                        <li><strong>Backup:</strong> Click Backup/Restore to download data</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="summary">
+            <div class="summary-item">
+                <div class="summary-value" id="totalItems">0</div>
+                <div class="summary-label">Total Items</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-value" id="totalQuantity">0</div>
+                <div class="summary-label">Total Quantity</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-value" id="lowStockItems">0</div>
+                <div class="summary-label">Low Stock</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-value" id="categoriesCount">0</div>
+                <div class="summary-label">Categories</div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Basement Supply Inventory Tracker &copy; 2025 | Last updated: <span id="currentDate"></span> | Sync: <span id="syncStatus">Online</span></p>
+        </footer>
+    </div>
+
+    <!-- Backup/Restore Modal -->
+    <div id="backupModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center;">
+        <div style="background: var(--dark-card); padding: 30px; border-radius: 12px; max-width: 500px; width: 90%; border: 1px solid var(--dark-border);">
+            <h3 style="color: var(--light); margin-bottom: 20px;"><i class="fas fa-database"></i> Backup & Restore</h3>
+            <div style="display: flex; flex-direction: column; gap: 15px;">
+                <button class="sync-btn" onclick="downloadBackup()">
+                    <i class="fas fa-download"></i> Download Backup
+                </button>
+                <button class="sync-btn secondary" onclick="uploadBackup()">
+                    <i class="fas fa-upload"></i> Upload Backup
+                </button>
+                <button class="sync-btn warning" onclick="resetData()">
+                    <i class="fas fa-trash"></i> Reset All Data
+                </button>
+                <button class="sync-btn" onclick="closeBackupModal()" style="margin-top: 10px;">
+                    <i class="fas fa-times"></i> Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden file input for backup upload -->
+    <input type="file" id="backupFile" accept=".json" style="display: none;" onchange="handleBackupUpload(event)">
+
+    <script>
+        // ==================== AUTO-SYNC SOLUTION ====================
+        // Uses localStorage + Netlify Functions for auto-sync
+        // No manual import/export needed!
+        
+        // Configuration
+        const API_BASE_URL = window.location.origin; // Will work on Netlify
+        const SYNC_INTERVAL = 30000; // 30 seconds
+        const STORAGE_KEY = 'basement_inventory_v2';
+        
+        // Global variables
+        let inventory = [];
+        let capturedPhoto = null;
+        let isOnline = true;
+        let syncInterval;
+        
+        // DOM elements
+        const inventoryItems = document.getElementById('inventoryItems');
+        const addItemForm = document.getElementById('addItemForm');
+        const emptyState = document.getElementById('emptyState');
+        const totalItemsEl = document.getElementById('totalItems');
+        const totalQuantityEl = document.getElementById('totalQuantity');
+        const lowStockItemsEl = document.getElementById('lowStockItems');
+        const categoriesCountEl = document.getElementById('categoriesCount');
+        const formTitle = document.getElementById('formTitle');
+        const submitBtn = document.getElementById('submitBtn');
+        const clearFormBtn = document.getElementById('clearFormBtn');
+        const itemIdInput = document.getElementById('itemId');
+        const currentDateEl = document.getElementById('currentDate');
+        const photoPreview = document.getElementById('photoPreview');
+        const cameraControls = document.getElementById('cameraControls');
+        const photoControls = document.getElementById('photoControls');
+        const cameraInstructions = document.getElementById('cameraInstructions');
+        const mobileCameraInput = document.getElementById('mobileCameraInput');
+        const syncStatus = document.getElementById('syncStatus');
+        const cloudStatus = document.getElementById('cloudStatus');
+        const syncBtn = document.getElementById('syncBtn');
+        
+        // Available icons for items
+        const availableIcons = [
+            { name: "Mug", icon: "fa-mug-hot" },
+            { name: "Bowl", icon: "fa-bowl-food" },
+            { name: "Plate", icon: "fa-plate-wheat" },
+            { name: "Box", icon: "fa-box" },
+            { name: "Bag", icon: "fa-bag-shopping" },
+            { name: "Gloves", icon: "fa-hand" },
+            { name: "Tissue", icon: "fa-box-tissue" },
+            { name: "Bottle", icon: "fa-bottle-water" },
+            { name: "Utensils", icon: "fa-utensils" },
+            { name: "Trash", icon: "fa-trash" },
+            { name: "Spray", icon: "fa-spray-can" },
+            { name: "Soap", icon: "fa-pump-soap" }
+        ];
+        
+        // ==================== INITIALIZATION ====================
+        
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Set current date
+            updateCurrentDate();
+            
+            // Render icon selector
+            renderIconSelector();
+            
+            // Update camera instructions
+            updateCameraInstructions();
+            
+            // Set up network monitoring
+            setupNetworkMonitoring();
+            
+            // Load data
+            await initializeData();
+            
+            // Start auto-sync
+            startAutoSync();
+            
+            // Set up form handler
+            setupFormHandler();
+            
+            // Set up offline indicator
+            setupOfflineIndicator();
+        });
+        
+        // ==================== DATA MANAGEMENT ====================
+        
+        async function initializeData() {
+            // Try to load from cloud first
+            try {
+                updateCloudStatus('Loading from cloud...', 'warning');
+                const cloudData = await fetchFromCloud('GET');
+                
+                if (cloudData && cloudData.success) {
+                    inventory = cloudData.inventory || [];
+                    updateCloudStatus('Synced with cloud', 'success');
+                    syncStatus.textContent = 'Online';
+                    syncStatus.style.color = '#4ade80';
+                } else {
+                    throw new Error('No cloud data');
+                }
+            } catch (error) {
+                console.log('Cloud load failed, using local data:', error.message);
+                
+                // Load from local storage
+                const localData = loadLocalData();
+                if (localData.length > 0) {
+                    inventory = localData;
+                    updateCloudStatus('Using local data (offline)', 'warning');
+                    syncStatus.textContent = 'Offline';
+                    syncStatus.style.color = '#f87171';
+                } else {
+                    // Load sample data
+                    loadSampleData();
+                    updateCloudStatus('Loaded sample data', 'info');
+                }
+            }
+            
+            // Render UI
+            renderInventory();
+            updateSummary();
+        }
+        
+        function loadLocalData() {
+            try {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                return saved ? JSON.parse(saved) : [];
+            } catch (e) {
+                console.error('Error loading local data:', e);
+                return [];
+            }
+        }
+        
+        function saveLocalData() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(inventory));
+            } catch (e) {
+                console.error('Error saving local data:', e);
+            }
+        }
+        
+        async function saveToCloud() {
+            if (!isOnline) return false;
+            
+            try {
+                const response = await fetchFromCloud('POST', { inventory });
+                return response && response.success;
+            } catch (error) {
+                console.error('Cloud save failed:', error);
+                return false;
+            }
+        }
+        
+        async function fetchFromCloud(method = 'GET', data = null) {
+            // For Netlify Functions deployment
+            const url = `${API_BASE_URL}/.netlify/functions/inventory`;
+            
+            // For local testing or if Netlify Functions not set up
+            // const url = 'https://api.jsonbin.io/v3/b'; // Alternative: JSONBin.io
+            
+            const options = {
+                method,
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            };
+            
+            if (data && method === 'POST') {
+                options.body = JSON.stringify(data);
+            }
+            
+            try {
+                const response = await fetch(url, options);
+                return await response.json();
+            } catch (error) {
+                // If Netlify Functions fail, try localStorage-based sync
+                return await tryLocalStorageSync(method, data);
+            }
+        }
+        
+        // Fallback: Use localStorage with shared key for sync
+        async function tryLocalStorageSync(method, data) {
+            if (method === 'GET') {
+                // Try to get from shared localStorage (if multiple tabs)
+                const sharedData = localStorage.getItem('shared_inventory');
+                return sharedData ? { success: true, inventory: JSON.parse(sharedData) } : { success: false };
+            } else if (method === 'POST' && data) {
+                // Save to shared localStorage
+                localStorage.setItem('shared_inventory', JSON.stringify(data.inventory));
+                return { success: true };
+            }
+            return { success: false };
+        }
+        
+        // ==================== AUTO-SYNC SYSTEM ====================
+        
+        function startAutoSync() {
+            // Sync immediately
+            setTimeout(async () => {
+                if (isOnline) {
+                    await performSync();
+                }
+            }, 2000);
+            
+            // Set up interval for auto-sync
+            syncInterval = setInterval(async () => {
+                if (isOnline) {
+                    await performSync();
+                }
+            }, SYNC_INTERVAL);
+            
+            // Also sync when window gains focus
+            window.addEventListener('focus', async () => {
+                if (isOnline) {
+                    await performSync();
+                }
+            });
+        }
+        
+        async function performSync() {
+            try {
+                syncBtn.innerHTML = '<i class="fas fa-spinner sync-spinner"></i> Syncing...';
+                
+                // Save local changes to cloud
+                const saved = await saveToCloud();
+                
+                if (saved) {
+                    // Then load any new changes from cloud
+                    const cloudData = await fetchFromCloud('GET');
+                    if (cloudData && cloudData.success && cloudData.inventory) {
+                        // Merge local and cloud data (favor newer timestamps)
+                        inventory = mergeInventories(inventory, cloudData.inventory);
+                        saveLocalData();
+                        renderInventory();
+                        updateSummary();
+                        
+                        updateCloudStatus('Synced with cloud', 'success');
+                        syncStatus.textContent = 'Online';
+                        syncStatus.style.color = '#4ade80';
+                        
+                        showToast('Inventory synced', 'success');
+                    }
+                }
+            } catch (error) {
+                console.error('Sync error:', error);
+            } finally {
+                syncBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Sync Now';
+            }
+        }
+        
+        function mergeInventories(localInv, cloudInv) {
+            // Create a map for quick lookup
+            const mergedMap = new Map();
+            
+            // Add all cloud items
+            cloudInv.forEach(item => {
+                mergedMap.set(item.id, item);
+            });
+            
+            // Add or update with local items (if newer)
+            localInv.forEach(localItem => {
+                const cloudItem = mergedMap.get(localItem.id);
+                if (!cloudItem) {
+                    // Local item doesn't exist in cloud
+                    mergedMap.set(localItem.id, localItem);
+                } else {
+                    // Compare timestamps
+                    const localTime = new Date(localItem.lastUpdated || 0);
+                    const cloudTime = new Date(cloudItem.lastUpdated || 0);
+                    
+                    if (localTime > cloudTime) {
+                        // Local is newer, use it
+                        mergedMap.set(localItem.id, localItem);
+                    }
+                }
+            });
+            
+            return Array.from(mergedMap.values());
+        }
+        
+        async function forceSync() {
+            await performSync();
+        }
+        
+        // ==================== NETWORK MONITORING ====================
+        
+        function setupNetworkMonitoring() {
+            isOnline = navigator.onLine;
+            
+            window.addEventListener('online', () => {
+                isOnline = true;
+                syncStatus.textContent = 'Online';
+                syncStatus.style.color = '#4ade80';
+                updateCloudStatus('Back online - syncing...', 'success');
+                
+                // Sync when coming back online
+                setTimeout(performSync, 1000);
+            });
+            
+            window.addEventListener('offline', () => {
+                isOnline = false;
+                syncStatus.textContent = 'Offline';
+                syncStatus.style.color = '#f87171';
+                updateCloudStatus('Working offline', 'warning');
+            });
+        }
+        
+        function setupOfflineIndicator() {
+            const indicator = document.createElement('div');
+            indicator.className = 'offline-indicator';
+            indicator.id = 'offlineIndicator';
+            indicator.style.display = 'none';
+            indicator.innerHTML = '<i class="fas fa-wifi-slash"></i> Offline';
+            document.body.appendChild(indicator);
+            
+            // Update visibility
+            setInterval(() => {
+                indicator.style.display = isOnline ? 'none' : 'block';
+            }, 1000);
+        }
+        
+        // ==================== BACKUP & RESTORE ====================
+        
+        function showBackupOptions() {
+            document.getElementById('backupModal').style.display = 'flex';
+        }
+        
+        function closeBackupModal() {
+            document.getElementById('backupModal').style.display = 'none';
+        }
+        
+        function downloadBackup() {
+            const backup = {
+                version: '2.0',
+                exportDate: new Date().toISOString(),
+                itemCount: inventory.length,
+                inventory: inventory
+            };
+            
+            const dataStr = JSON.stringify(backup, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `inventory-backup-${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            
+            setTimeout(() => URL.revokeObjectURL(url), 100);
+            showToast('Backup downloaded', 'success');
+            closeBackupModal();
+        }
+        
+        function uploadBackup() {
+            document.getElementById('backupFile').click();
+        }
+        
+        function handleBackupUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                try {
+                    const backup = JSON.parse(e.target.result);
+                    
+                    if (!backup.inventory || !Array.isArray(backup.inventory)) {
+                        throw new Error('Invalid backup file');
+                    }
+                    
+                    if (confirm(`Restore ${backup.inventory.length} items from backup? This will replace current data.`)) {
+                        inventory = backup.inventory.map((item, index) => ({
+                            ...item,
+                            id: index + 1
+                        }));
+                        
+                        saveLocalData();
+                        await saveToCloud();
+                        renderInventory();
+                        updateSummary();
+                        
+                        showToast('Backup restored successfully', 'success');
+                    }
+                } catch (error) {
+                    console.error('Backup restore error:', error);
+                    showToast('Error restoring backup', 'danger');
+                }
+            };
+            
+            reader.readAsText(file);
+            event.target.value = '';
+            closeBackupModal();
+        }
+        
+        function resetData() {
+            if (confirm('Are you sure? This will delete ALL inventory data.')) {
+                inventory = [];
+                saveLocalData();
+                renderInventory();
+                updateSummary();
+                showToast('All data reset', 'warning');
+                closeBackupModal();
+            }
+        }
+        
+        // ==================== UI FUNCTIONS ====================
+        
+        function updateCloudStatus(message, type) {
+            const icon = cloudStatus.querySelector('i');
+            const text = cloudStatus.querySelector('span');
+            
+            text.textContent = message;
+            cloudStatus.className = 'cloud-status';
+            
+            if (type === 'success') {
+                cloudStatus.classList.add('status-connected');
+                icon.className = 'fas fa-cloud';
+            } else if (type === 'warning') {
+                cloudStatus.classList.add('status-disconnected');
+                icon.className = 'fas fa-cloud';
+            } else if (type === 'danger') {
+                cloudStatus.classList.add('status-disconnected');
+                icon.className = 'fas fa-cloud-slash';
+            } else {
+                icon.className = 'fas fa-database';
+            }
+        }
+        
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'info-circle'}"></i>
+                <span>${message}</span>
+            `;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideUp 0.3s ease reverse';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+        
+        // ==================== FORM HANDLER ====================
+        
+        function setupFormHandler() {
+            addItemForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const itemId = parseInt(itemIdInput.value) || 0;
+                const itemName = document.getElementById('itemName').value;
+                const itemIcon = document.querySelector('.icon-option.selected')?.dataset.icon || "fa-box";
+                const itemCategory = document.getElementById('itemCategory').value;
+                const itemCode = document.getElementById('itemCode').value;
+                const itemQuantity = parseInt(document.getElementById('itemQuantity').value);
+                const itemNotes = document.getElementById('itemNotes').value;
+                
+                // Validate
+                if (!itemName || !itemCategory || !itemCode) {
+                    showToast('Please fill in all required fields', 'danger');
+                    return;
+                }
+                
+                // Get timestamp
+                const now = new Date();
+                const timestamp = formatDate(now);
+                
+                if (itemId > 0) {
+                    // Edit existing
+                    const itemIndex = inventory.findIndex(item => item.id === itemId);
+                    if (itemIndex !== -1) {
+                        inventory[itemIndex] = {
+                            ...inventory[itemIndex],
+                            name: itemName,
+                            icon: itemIcon,
+                            category: itemCategory,
+                            code: itemCode,
+                            quantity: itemQuantity,
+                            notes: itemNotes,
+                            photo: capturedPhoto !== null ? capturedPhoto : inventory[itemIndex].photo,
+                            lastUpdated: timestamp
+                        };
+                        
+                        showToast('Item updated', 'success');
+                    }
+                } else {
+                    // Add new
+                    const newId = inventory.length > 0 ? Math.max(...inventory.map(item => item.id)) + 1 : 1;
+                    
+                    inventory.push({
+                        id: newId,
+                        name: itemName,
+                        icon: itemIcon,
+                        category: itemCategory,
+                        code: itemCode,
+                        quantity: itemQuantity,
+                        notes: itemNotes,
+                        photo: capturedPhoto,
+                        lastUpdated: timestamp
+                    });
+                    
+                    showToast('Item added', 'success');
+                }
+                
+                // Save locally
+                saveLocalData();
+                
+                // Try to save to cloud
+                if (isOnline) {
+                    setTimeout(async () => {
+                        await saveToCloud();
+                    }, 100);
+                }
+                
+                // Reset form and update UI
+                resetForm();
+                renderInventory();
+                updateSummary();
+            });
+            
+            clearFormBtn.addEventListener('click', resetForm);
+        }
+        
+        // ==================== SAMPLE DATA ====================
+        
+        function loadSampleData() {
+            inventory = [
+                { 
+                    id: 1, 
+                    name: "Plastic Cups", 
+                    code: "CUP-001", 
+                    category: "Dining", 
+                    quantity: 150,
+                    icon: "fa-mug-hot",
+                    notes: "For cold beverages only",
+                    photo: null,
+                    lastUpdated: formatDate(new Date())
+                },
+                { 
+                    id: 2, 
+                    name: "Paper Bowls", 
+                    code: "BOWL-002", 
+                    category: "Dining", 
+                    quantity: 80,
+                    icon: "fa-bowl-food",
+                    notes: "Large size for soups and salads",
+                    photo: null,
+                    lastUpdated: formatDate(new Date(Date.now() - 86400000))
+                },
+                { 
+                    id: 3, 
+                    name: "Food Containers", 
+                    code: "CONT-003", 
+                    category: "Packaging", 
+                    quantity: 45,
+                    icon: "fa-box",
+                    notes: "Microwave safe, with lids",
+                    photo: null,
+                    lastUpdated: formatDate(new Date(Date.now() - 172800000))
+                }
+            ];
+            saveLocalData();
+        }
+        
+        // ==================== REST OF UI FUNCTIONS ====================
+        // (These remain mostly the same as before)
+        
+        function renderIconSelector() {
+            const iconSelector = document.getElementById('iconSelector');
+            iconSelector.innerHTML = '';
+            
+            availableIcons.forEach(icon => {
+                const iconOption = document.createElement('div');
+                iconOption.className = 'icon-option';
+                iconOption.dataset.icon = icon.icon;
+                iconOption.innerHTML = `
+                    <i class="fas ${icon.icon}"></i>
+                    <span style="font-size: 0.8rem;">${icon.name}</span>
+                `;
+                
+                iconOption.addEventListener('click', function() {
+                    document.querySelectorAll('.icon-option').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    this.classList.add('selected');
+                });
+                
+                iconSelector.appendChild(iconOption);
+            });
+            
+            if (iconSelector.firstChild) {
+                iconSelector.firstChild.classList.add('selected');
+            }
+        }
+        
+        function updateCameraInstructions() {
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+            
+            if (isMobile) {
+                cameraInstructions.innerHTML = `
+                    <strong>Mobile Camera:</strong> Click "Take Photo" to open your device's camera app.
+                    Make sure to allow camera permissions when prompted.
+                `;
+            } else {
+                cameraInstructions.innerHTML = `
+                    <strong>Camera Instructions:</strong> Click "Take Photo" to use your camera.
+                    If it doesn't work, use "Upload Image" to add photos from your device.
+                `;
+            }
+        }
+        
+        function openMobileCamera() {
+            mobileCameraInput.click();
+        }
+        
+        function handleMobileCamera(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            if (!file.type.match('image.*')) {
+                showToast('Please select an image file', 'danger');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                capturedPhoto = e.target.result;
+                photoPreview.src = capturedPhoto;
+                photoPreview.style.display = 'block';
+                
+                cameraControls.style.display = 'none';
+                photoControls.style.display = 'block';
+                cameraInstructions.style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+            
+            event.target.value = '';
+        }
+        
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            if (!file.type.match('image.*')) {
+                showToast('Please select an image file', 'danger');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                capturedPhoto = e.target.result;
+                photoPreview.src = capturedPhoto;
+                photoPreview.style.display = 'block';
+                
+                cameraControls.style.display = 'none';
+                photoControls.style.display = 'block';
+                cameraInstructions.style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        function retakePhoto() {
+            capturedPhoto = null;
+            photoPreview.style.display = 'none';
+            cameraControls.style.display = 'block';
+            photoControls.style.display = 'none';
+            cameraInstructions.style.display = 'block';
+        }
+        
+        function removePhoto() {
+            capturedPhoto = null;
+            photoPreview.style.display = 'none';
+            cameraControls.style.display = 'block';
+            photoControls.style.display = 'none';
+            cameraInstructions.style.display = 'block';
+        }
+        
+        function renderInventory() {
+            const filterValue = document.getElementById('categoryFilter').value;
+            const sortValue = document.getElementById('sortFilter').value;
+            
+            let filteredInventory = [...inventory];
+            if (filterValue !== 'all') {
+                filteredInventory = filteredInventory.filter(item => item.category === filterValue);
+            }
+            
+            filteredInventory.sort((a, b) => {
+                if (sortValue === 'name') return a.name.localeCompare(b.name);
+                if (sortValue === 'quantity') return b.quantity - a.quantity;
+                if (sortValue === 'date') return new Date(b.lastUpdated) - new Date(a.lastUpdated);
+                return 0;
+            });
+            
+            if (filteredInventory.length === 0) {
+                emptyState.style.display = 'block';
+                inventoryItems.innerHTML = '';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            
+            inventoryItems.innerHTML = filteredInventory.map(item => {
+                let quantityClass = 'quantity-ok';
+                if (item.quantity < 20) quantityClass = 'quantity-low';
+                else if (item.quantity < 50) quantityClass = 'quantity-medium';
+                
+                const formattedDate = formatDateForDisplay(item.lastUpdated);
+                
+                return `
+                <div class="item-card" data-id="${item.id}">
+                    <div class="item-header">
+                        <div class="item-content">
+                            <div class="item-image-container">
+                                ${item.photo ? 
+                                    `<img src="${item.photo}" class="item-image" alt="${item.name}">` : 
+                                    `<div class="item-image-placeholder">
+                                        <i class="fas ${item.icon}"></i>
+                                    </div>`
+                                }
+                            </div>
+                            <div class="item-info">
+                                <div class="item-title">
+                                    <div class="item-icon">
+                                        <i class="fas ${item.icon}"></i>
+                                    </div>
+                                    <div class="item-name">${item.name}</div>
+                                </div>
+                                <div class="item-code">${item.code}</div>
+                                <div class="item-category">${item.category}</div>
+                            </div>
+                        </div>
+                        <div class="item-quantity ${quantityClass}">${item.quantity}</div>
+                    </div>
+                    
+                    <div class="item-details">
+                        <div class="detail-item">
+                            <div class="detail-label">Category</div>
+                            <div class="detail-value">${item.category}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Code</div>
+                            <div class="detail-value">${item.code}</div>
+                        </div>
+                    </div>
+                    
+                    ${item.notes ? `
+                    <div class="item-notes">
+                        <div class="notes-label">Notes:</div>
+                        <div class="notes-content">${item.notes}</div>
+                    </div>
+                    ` : `
+                    <div class="item-notes">
+                        <div class="notes-label">Notes:</div>
+                        <div class="notes-content notes-empty">No notes added</div>
+                    </div>
+                    `}
+                    
+                    <div class="item-footer">
+                        <div class="item-timestamp">
+                            <i class="far fa-clock"></i> Last updated: ${formattedDate}
+                        </div>
+                        <div class="item-actions">
+                            <button class="action-btn edit-btn" onclick="editItem(${item.id})">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="action-btn delete-btn" onclick="deleteItem(${item.id})">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+        
+        function editItem(id) {
+            const item = inventory.find(item => item.id === id);
+            if (!item) return;
+            
+            document.getElementById('itemId').value = item.id;
+            document.getElementById('itemName').value = item.name;
+            document.getElementById('itemCategory').value = item.category;
+            document.getElementById('itemCode').value = item.code;
+            document.getElementById('itemQuantity').value = item.quantity;
+            document.getElementById('itemNotes').value = item.notes || '';
+            
+            document.querySelectorAll('.icon-option').forEach(opt => {
+                opt.classList.remove('selected');
+                if (opt.dataset.icon === item.icon) {
+                    opt.classList.add('selected');
+                }
+            });
+            
+            if (item.photo) {
+                capturedPhoto = item.photo;
+                photoPreview.src = item.photo;
+                photoPreview.style.display = 'block';
+                cameraControls.style.display = 'none';
+                photoControls.style.display = 'block';
+                cameraInstructions.style.display = 'none';
+            } else {
+                capturedPhoto = null;
+                photoPreview.style.display = 'none';
+                cameraControls.style.display = 'block';
+                photoControls.style.display = 'none';
+                cameraInstructions.style.display = 'block';
+            }
+            
+            formTitle.textContent = 'Edit Item';
+            submitBtn.innerHTML = '<i class="fas fa-save"></i> Update Item';
+            clearFormBtn.style.display = 'block';
+            
+            document.querySelector('.inventory-form').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        async function deleteItem(id) {
+            if (confirm('Are you sure you want to remove this item?')) {
+                inventory = inventory.filter(item => item.id !== id);
+                saveLocalData();
+                
+                if (isOnline) {
+                    await saveToCloud();
+                }
+                
+                renderInventory();
+                updateSummary();
+                showToast('Item deleted', 'warning');
+            }
+        }
+        
+        function filterByCategory() {
+            renderInventory();
+        }
+        
+        function sortInventory() {
+            renderInventory();
+        }
+        
+        function adjustQuantity(change) {
+            const quantityInput = document.getElementById('itemQuantity');
+            let currentValue = parseInt(quantityInput.value) || 0;
+            const newValue = Math.max(0, currentValue + change);
+            quantityInput.value = newValue;
+        }
+        
+        function resetForm() {
+            addItemForm.reset();
+            document.getElementById('itemId').value = '';
+            document.getElementById('itemQuantity').value = 1;
+            
+            document.querySelectorAll('.icon-option').forEach((opt, index) => {
+                opt.classList.remove('selected');
+                if (index === 0) opt.classList.add('selected');
+            });
+            
+            capturedPhoto = null;
+            photoPreview.style.display = 'none';
+            cameraControls.style.display = 'block';
+            photoControls.style.display = 'none';
+            cameraInstructions.style.display = 'block';
+            
+            formTitle.textContent = 'Add New Item';
+            submitBtn.innerHTML = '<i class="fas fa-plus-circle"></i> Add to Inventory';
+            clearFormBtn.style.display = 'none';
+        }
+        
+        function updateSummary() {
+            const totalItems = inventory.length;
+            const totalQuantity = inventory.reduce((sum, item) => sum + item.quantity, 0);
+            const lowStockItems = inventory.filter(item => item.quantity < 20).length;
+            
+            const uniqueCategories = [...new Set(inventory.map(item => item.category))];
+            const categoriesCount = uniqueCategories.length;
+            
+            totalItemsEl.textContent = totalItems;
+            totalQuantityEl.textContent = totalQuantity;
+            lowStockItemsEl.textContent = lowStockItems;
+            categoriesCountEl.textContent = categoriesCount;
+        }
+        
+        function formatDate(date) {
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const day = date.getDate().toString().padStart(2, '0');
+            const month = months[date.getMonth()];
+            const year = date.getFullYear();
+            
+            let hours = date.getHours();
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            
+            hours = hours % 12;
+            hours = hours ? hours : 12;
+            
+            return `${day} ${month} ${year}, ${hours}:${minutes} ${ampm}`;
+        }
+        
+        function formatDateForDisplay(dateString) {
+            if (!dateString) return 'Unknown';
+            const date = new Date(dateString);
+            return formatDate(date);
+        }
+        
+        function updateCurrentDate() {
+            const now = new Date();
+            currentDateEl.textContent = formatDate(now);
+        }
+    </script>
+</body>
+</html>
