@@ -1,0 +1,86 @@
+name: Keep Supabase Active
+
+on:
+  # Runs at 8 AM, 2 PM, and 8 PM UTC every day (covers all timezones)
+  schedule:
+    - cron: '0 8,14,20 * * *'  # 3 times daily
+  # Manual trigger option for testing
+  workflow_dispatch:
+    inputs:
+      ping_type:
+        description: 'Type of ping to perform'
+        required: false
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - rest
+          - auth
+          - storage
+
+jobs:
+  ping-supabase:
+    runs-on: ubuntu-latest
+    environment: production  # Optional: Use environment protection
+    
+    steps:
+    - name: Check current time
+      run: echo "🕒 Workflow triggered at $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+    
+    - name: Ping Supabase REST API
+      env:
+        SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+        SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+      run: |
+        echo "🌐 Pinging Supabase REST API..."
+        
+        # Call the keep_alive function (create this in Supabase SQL editor)
+        curl -s -o /dev/null -w "🔧 keep_alive(): %{http_code}\n" \
+          -X POST "$SUPABASE_URL/rest/v1/rpc/keep_alive" \
+          -H "apikey: $SUPABASE_ANON_KEY" \
+          -H "Content-Type: application/json" \
+          -H "Prefer: return=minimal" \
+          -d '{"ping_time": "'"$(date -u '+%Y-%m-%d %H:%M:%S')"'"}' \
+          --max-time 10
+        
+        # Simple metadata query
+        curl -s -o /dev/null -w "📊 metadata: %{http_code}\n" \
+          -X GET "$SUPABASE_URL/rest/v1/?select=*&limit=0" \
+          -H "apikey: $SUPABASE_ANON_KEY" \
+          -H "Content-Type: application/json" \
+          --max-time 10
+        
+        # Check if profiles table exists (or any table you have)
+        curl -s -o /dev/null -w "👤 profiles: %{http_code}\n" \
+          -X GET "$SUPABASE_URL/rest/v1/profiles?select=id&limit=1" \
+          -H "apikey: $SUPABASE_ANON_KEY" \
+          -H "Content-Type: application/json" \
+          --max-time 10
+    
+    - name: Ping Supabase Auth
+      env:
+        SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      run: |
+        echo "🔐 Pinging Supabase Auth..."
+        curl -s -o /dev/null -w "🩺 auth/health: %{http_code}\n" \
+          -X GET "$SUPABASE_URL/auth/v1/health" \
+          --max-time 10
+    
+    - name: Ping Supabase Storage (if used)
+      env:
+        SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+        SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+      run: |
+        echo "📦 Pinging Supabase Storage..."
+        curl -s -o /dev/null -w "📁 storage: %{http_code}\n" \
+          -X GET "$SUPABASE_URL/storage/v1/bucket" \
+          -H "apikey: $SUPABASE_ANON_KEY" \
+          --max-time 10 || echo "⚠️  Storage not configured or error (this is okay)"
+    
+    - name: Log successful execution
+      run: |
+        echo "✅ Supabase ping completed successfully at $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+        echo "📅 Next scheduled run:"
+        echo "   • 08:00 UTC"
+        echo "   • 14:00 UTC"
+        echo "   • 20:00 UTC"
