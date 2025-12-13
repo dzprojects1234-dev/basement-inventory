@@ -213,6 +213,8 @@
             display: flex;
             align-items: center;
             gap: 15px;
+            flex: 1;
+            min-width: 0; /* Allows text truncation */
         }
 
         .item-icon {
@@ -225,12 +227,21 @@
             justify-content: center;
             font-size: 24px;
             color: white;
+            flex-shrink: 0;
+        }
+
+        .item-details {
+            flex: 1;
+            min-width: 0; /* Allows text truncation */
         }
 
         .item-details h3 {
             color: var(--light);
             margin-bottom: 5px;
             font-size: 16px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .item-details p {
@@ -239,6 +250,28 @@
             display: flex;
             align-items: center;
             gap: 5px;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .item-details .item-notes {
+            font-size: 13px;
+            color: var(--dark-text-secondary);
+            opacity: 0.8;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 300px;
+        }
+
+        .item-meta {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            margin: 0 15px;
         }
 
         .item-quantity {
@@ -250,6 +283,20 @@
             font-weight: bold;
             color: var(--light);
             min-width: 80px;
+            font-size: 14px;
+        }
+
+        .item-photo-indicator {
+            background: var(--dark-bg);
+            border: 1px solid var(--dark-border);
+            border-radius: 8px;
+            padding: 4px 8px;
+            font-size: 11px;
+            color: var(--info);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            cursor: default;
         }
 
         .low-stock {
@@ -264,7 +311,7 @@
 
         .item-actions {
             display: flex;
-            gap: 10px;
+            gap: 8px;
         }
 
         .action-btn {
@@ -279,11 +326,17 @@
             align-items: center;
             justify-content: center;
             transition: all 0.3s ease;
+            flex-shrink: 0;
         }
 
         .action-btn:hover {
             background: var(--primary);
             border-color: var(--primary);
+        }
+
+        .view-btn:hover {
+            background: var(--info);
+            border-color: var(--info);
         }
 
         .edit-btn:hover {
@@ -294,6 +347,92 @@
         .delete-btn:hover {
             background: var(--danger);
             border-color: var(--danger);
+        }
+
+        /* Attachment Modal */
+        #attachmentModal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: var(--dark-card);
+            padding: 0;
+            border-radius: 16px;
+            max-width: 800px;
+            width: 90%;
+            border: 1px solid var(--dark-border);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+        }
+
+        .modal-header {
+            padding: 20px 30px;
+            border-bottom: 1px solid var(--dark-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            color: var(--light);
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .close-modal {
+            background: transparent;
+            border: none;
+            color: var(--dark-text-secondary);
+            font-size: 24px;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .close-modal:hover {
+            background: var(--dark-bg);
+            color: var(--light);
+        }
+
+        .modal-body {
+            padding: 30px;
+            text-align: center;
+        }
+
+        .attachment-image {
+            max-width: 100%;
+            max-height: 500px;
+            border-radius: 8px;
+            border: 1px solid var(--dark-border);
+            margin-bottom: 20px;
+        }
+
+        .no-attachment {
+            padding: 40px;
+            color: var(--dark-text-secondary);
+            font-size: 16px;
+        }
+
+        .no-attachment i {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
         }
 
         /* Empty State */
@@ -495,6 +634,45 @@
             background: var(--primary-dark);
         }
 
+        .photo-btn.danger {
+            background: var(--dark-bg);
+        }
+
+        .photo-btn.danger:hover {
+            background: var(--danger);
+            border-color: var(--danger);
+        }
+
+        .cancel-btn {
+            flex: 0 0 auto;
+            padding: 12px 20px;
+            background: transparent;
+            border: 1px solid var(--danger);
+            color: var(--danger);
+            border-radius: 8px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .cancel-btn:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        .cancel-btn.visible {
+            display: flex;
+        }
+
+        .photo-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
         /* Buttons */
         .add-btn {
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
@@ -644,7 +822,7 @@
             justify-content: center;
         }
 
-        .modal-content {
+        .login-modal-content {
             background: var(--dark-card);
             padding: 40px;
             border-radius: 16px;
@@ -654,7 +832,7 @@
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
         }
 
-        .modal-content h2 {
+        .login-modal-content h2 {
             color: var(--light);
             margin-bottom: 20px;
             display: flex;
@@ -662,10 +840,21 @@
             gap: 10px;
         }
 
-        .modal-content p {
+        .login-modal-content p {
             color: var(--dark-text-secondary);
             margin-bottom: 30px;
             line-height: 1.6;
+        }
+
+        .modal-input {
+            width: 100%;
+            background: var(--dark-bg);
+            border: 1px solid var(--dark-border);
+            color: var(--light);
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 20px;
         }
 
         .modal-actions {
@@ -741,13 +930,26 @@
         
         <!-- Login Modal -->
         <div id="loginModal" class="modal">
-            <div class="modal-content">
+            <div class="login-modal-content">
                 <h2><i class="fas fa-lock"></i> Enter Access Code</h2>
                 <p>Enter the access code provided by your manager to connect to the shared database. This allows real-time synchronization with your team.</p>
                 <input type="password" id="accessCode" placeholder="Enter access code" class="modal-input">
                 <div class="modal-actions">
                     <button onclick="checkAccessCode()">Connect</button>
                     <button onclick="useLocalMode()">Use Local Mode</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Attachment Modal -->
+        <div id="attachmentModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2><i class="fas fa-paperclip"></i> Item Attachment</h2>
+                    <button class="close-modal" onclick="closeAttachmentModal()">&times;</button>
+                </div>
+                <div class="modal-body" id="attachmentModalBody">
+                    <!-- Attachment content will be loaded here -->
                 </div>
             </div>
         </div>
@@ -855,15 +1057,20 @@
                         <label>Item Photo (Optional)</label>
                         <div class="photo-section">
                             <img id="photoPreview" class="photo-preview" alt="Photo preview">
-                            <div class="camera-controls">
-                                <button type="button" class="photo-btn" onclick="openMobileCamera()">
-                                    <i class="fas fa-camera"></i> Take Photo
+                            <div class="photo-controls">
+                                <div class="camera-controls">
+                                    <button type="button" class="photo-btn" onclick="openMobileCamera()">
+                                        <i class="fas fa-camera"></i> Take Photo
+                                    </button>
+                                    <input type="file" id="mobileCameraInput" accept="image/*" capture="environment" style="display: none;" onchange="handleMobileCamera(event)">
+                                    <button type="button" class="photo-btn secondary" onclick="document.getElementById('fileUpload').click()">
+                                        <i class="fas fa-upload"></i> Upload Image
+                                    </button>
+                                    <input type="file" id="fileUpload" accept="image/*" style="display: none;" onchange="handleFileUpload(event)">
+                                </div>
+                                <button type="button" class="cancel-btn" id="cancelPhotoBtn" onclick="cancelPhoto()">
+                                    <i class="fas fa-times"></i> Cancel
                                 </button>
-                                <input type="file" id="mobileCameraInput" accept="image/*" capture="environment" style="display: none;" onchange="handleMobileCamera(event)">
-                                <button type="button" class="photo-btn secondary" onclick="document.getElementById('fileUpload').click()">
-                                    <i class="fas fa-upload"></i> Upload Image
-                                </button>
-                                <input type="file" id="fileUpload" accept="image/*" style="display: none;" onchange="handleFileUpload(event)">
                             </div>
                         </div>
                     </div>
@@ -934,7 +1141,10 @@
             statusText: document.getElementById('statusText'),
             cloudStatus: document.getElementById('cloudStatus'),
             loginModal: document.getElementById('loginModal'),
-            dataMode: document.getElementById('dataMode')
+            attachmentModal: document.getElementById('attachmentModal'),
+            attachmentModalBody: document.getElementById('attachmentModalBody'),
+            dataMode: document.getElementById('dataMode'),
+            cancelPhotoBtn: document.getElementById('cancelPhotoBtn')
         };
 
         // ==================== INITIALIZATION ====================
@@ -1325,6 +1535,9 @@
                 const quantityClass = item.quantity <= 5 ? 'critical-stock' : 
                                     item.quantity <= 10 ? 'low-stock' : '';
                 
+                // Check if item has photo
+                const hasPhoto = item.photo ? true : false;
+                
                 itemElement.innerHTML = `
                     <div class="item-info">
                         <div class="item-icon">
@@ -1333,13 +1546,15 @@
                         <div class="item-details">
                             <h3>${item.name}</h3>
                             <p><i class="fas fa-tag"></i> ${item.code} | <i class="fas fa-folder"></i> ${item.category}</p>
-                            ${item.notes ? `<p><i class="fas fa-sticky-note"></i> ${item.notes.substring(0, 50)}${item.notes.length > 50 ? '...' : ''}</p>` : ''}
+                            ${item.notes ? `<p class="item-notes"><i class="fas fa-sticky-note"></i> ${item.notes.substring(0, 50)}${item.notes.length > 50 ? '...' : ''}</p>` : ''}
                         </div>
                     </div>
                     <div class="item-meta">
                         <div class="item-quantity ${quantityClass}">${item.quantity}</div>
+                        ${hasPhoto ? '<div class="item-photo-indicator"><i class="fas fa-paperclip"></i> Has Photo</div>' : ''}
                     </div>
                     <div class="item-actions">
+                        ${hasPhoto ? '<button class="action-btn view-btn" onclick="viewAttachment(' + item.id + ')"><i class="fas fa-eye"></i></button>' : ''}
                         <button class="action-btn edit-btn" onclick="editItem(${item.id})">
                             <i class="fas fa-edit"></i>
                         </button>
@@ -1379,6 +1594,7 @@
                 const preview = document.getElementById('photoPreview');
                 preview.src = item.photo;
                 preview.classList.add('visible');
+                elements.cancelPhotoBtn.classList.add('visible');
             }
             
             // Update form title and button
@@ -1407,10 +1623,7 @@
             }
             
             // Clear photo
-            capturedPhoto = null;
-            const preview = document.getElementById('photoPreview');
-            preview.src = '';
-            preview.classList.remove('visible');
+            cancelPhoto();
             
             // Reset form UI
             elements.formTitle.textContent = 'Add New Item';
@@ -1467,6 +1680,97 @@
             renderInventory();
         }
 
+        // ==================== ATTACHMENT FUNCTIONS ====================
+        function viewAttachment(id) {
+            const item = inventory.find(i => i.id === id);
+            if (!item) return;
+            
+            const modalBody = elements.attachmentModalBody;
+            
+            if (item.photo) {
+                modalBody.innerHTML = `
+                    <div>
+                        <img src="${item.photo}" class="attachment-image" alt="${item.name}">
+                        <div style="margin-top: 20px; color: var(--dark-text-secondary);">
+                            <p><strong>${item.name}</strong> (${item.code})</p>
+                            <p>Category: ${item.category} | Quantity: ${item.quantity}</p>
+                            ${item.notes ? `<p>Notes: ${item.notes}</p>` : ''}
+                        </div>
+                    </div>
+                `;
+            } else {
+                modalBody.innerHTML = `
+                    <div class="no-attachment">
+                        <i class="fas fa-image"></i>
+                        <p>No attachment available for this item</p>
+                    </div>
+                `;
+            }
+            
+            elements.attachmentModal.style.display = 'flex';
+        }
+
+        function closeAttachmentModal() {
+            elements.attachmentModal.style.display = 'none';
+        }
+
+        // ==================== PHOTO FUNCTIONS ====================
+        function cancelPhoto() {
+            capturedPhoto = null;
+            const preview = document.getElementById('photoPreview');
+            preview.src = '';
+            preview.classList.remove('visible');
+            elements.cancelPhotoBtn.classList.remove('visible');
+            
+            // Clear file inputs
+            document.getElementById('mobileCameraInput').value = '';
+            document.getElementById('fileUpload').value = '';
+            
+            showToast('Photo removed', 'info');
+        }
+
+        function openMobileCamera() {
+            document.getElementById('mobileCameraInput').click();
+        }
+
+        function handleMobileCamera(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                capturedPhoto = e.target.result;
+                const preview = document.getElementById('photoPreview');
+                preview.src = capturedPhoto;
+                preview.classList.add('visible');
+                elements.cancelPhotoBtn.classList.add('visible');
+                showToast('Photo captured', 'success');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            // Check file size (max 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                showToast('File too large (max 5MB)', 'warning');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                capturedPhoto = e.target.result;
+                const preview = document.getElementById('photoPreview');
+                preview.src = capturedPhoto;
+                preview.classList.add('visible');
+                elements.cancelPhotoBtn.classList.add('visible');
+                showToast('Photo uploaded', 'success');
+            };
+            reader.readAsDataURL(file);
+        }
+
         // ==================== UTILITY FUNCTIONS ====================
         function loadData() {
             if (isOnlineMode) {
@@ -1501,47 +1805,6 @@
             showToast('Backup exported successfully', 'success');
         }
 
-        // ==================== CAMERA FUNCTIONS ====================
-        function openMobileCamera() {
-            document.getElementById('mobileCameraInput').click();
-        }
-
-        function handleMobileCamera(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                capturedPhoto = e.target.result;
-                const preview = document.getElementById('photoPreview');
-                preview.src = capturedPhoto;
-                preview.classList.add('visible');
-                showToast('Photo captured', 'success');
-            };
-            reader.readAsDataURL(file);
-        }
-
-        function handleFileUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            
-            // Check file size (max 5MB)
-            if (file.size > 5 * 1024 * 1024) {
-                showToast('File too large (max 5MB)', 'warning');
-                return;
-            }
-            
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                capturedPhoto = e.target.result;
-                const preview = document.getElementById('photoPreview');
-                preview.src = capturedPhoto;
-                preview.classList.add('visible');
-                showToast('Photo uploaded', 'success');
-            };
-            reader.readAsDataURL(file);
-        }
-
         function adjustQuantity(change) {
             const input = document.getElementById('itemQuantity');
             const current = parseInt(input.value) || 0;
@@ -1556,10 +1819,20 @@
             }
         });
 
-        // Close modal when clicking outside
-        elements.loginModal.addEventListener('click', function(e) {
-            if (e.target === this) {
-                this.style.display = 'none';
+        // Close modals when clicking outside
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.style.display = 'none';
+                }
+            });
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                elements.attachmentModal.style.display = 'none';
+                elements.loginModal.style.display = 'none';
             }
         });
     </script>
