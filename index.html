@@ -6,634 +6,644 @@
     <title>Basement Supply Inventory Tracker</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* [ALL YOUR CSS STYLES - KEEP THEM] */
-        :root {
-            --primary: #7c3aed;
-            --primary-dark: #6d28d9;
-            --secondary: #10b981;
-            --success: #10b981;
-            --danger: #ef4444;
-            --warning: #f59e0b;
-            --info: #3b82f6;
-            --dark-bg: #0f172a;
-            --dark-card: #1e293b;
-            --dark-border: #334155;
-            --dark-text: #f1f5f9;
-            --dark-text-secondary: #94a3b8;
-            --light: #f8fafc;
-            --gray-light: #cbd5e1;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        /* ... rest of your CSS ... */
+
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --accent: #4cc9f0;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #4CAF50;
+            --warning: #ff9800;
+            --danger: #f44336;
+            --gray: #6c757d;
+            --border: #dee2e6;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--dark);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 30px;
+        }
+
+        /* Header Styles */
+        header {
+            grid-column: 1 / -1;
+            background: white;
+            padding: 25px 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 20px;
+            border-left: 5px solid var(--primary);
+        }
+
+        h1 {
+            color: var(--primary);
+            font-size: 2.2rem;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: var(--gray);
+            font-size: 1rem;
+            margin-bottom: 15px;
+        }
+
+        .local-storage-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--light);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            color: var(--gray);
+            border: 1px solid var(--border);
+        }
+
+        /* Inventory Section */
+        .inventory-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        h2 {
+            color: var(--secondary);
+            font-size: 1.6rem;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        select {
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: white;
+            color: var(--dark);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        select:hover {
+            border-color: var(--primary);
+        }
+
+        .inventory-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .inventory-table th {
+            text-align: left;
+            padding: 15px;
+            background: var(--light);
+            color: var(--dark);
+            font-weight: 600;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .inventory-table td {
+            padding: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--gray);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: var(--border);
+        }
+
+        .empty-state h3 {
+            margin-bottom: 10px;
+            color: var(--gray);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(67, 97, 238, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--light);
+            color: var(--dark);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: #e9ecef;
+            border-color: var(--gray);
+        }
+
+        /* Add Item Form */
+        .form-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        label.required:after {
+            content: " *";
+            color: var(--danger);
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+
+        .icon-selection {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .icon-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px 10px;
+            border-radius: 10px;
+            border: 2px solid var(--border);
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .icon-option:hover {
+            border-color: var(--accent);
+            transform: translateY(-3px);
+        }
+
+        .icon-option.selected {
+            border-color: var(--primary);
+            background: rgba(67, 97, 238, 0.05);
+        }
+
+        .icon-option i {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+            color: var(--primary);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+            width: 100%;
+            justify-content: center;
+            padding: 14px;
+            font-size: 1.1rem;
+            margin-top: 10px;
+        }
+
+        .btn-success:hover {
+            background: #3d8b40;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(76, 175, 80, 0.3);
+        }
+
+        /* Item Display (when added) */
+        .item-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            border-radius: 10px;
+            background: white;
+            margin-bottom: 10px;
+            border: 1px solid var(--border);
+            animation: fadeIn 0.5s;
+        }
+
+        .item-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            background: rgba(67, 97, 238, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+
+        .item-details {
+            flex-grow: 1;
+        }
+
+        .item-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .item-category {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+
+        .item-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            color: var(--gray);
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+        .action-btn:hover {
+            color: var(--primary);
+            background: rgba(67, 97, 238, 0.1);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-section {
+                position: static;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .controls {
+                width: 100%;
+                flex-direction: column;
+            }
+            
+            select {
+                width: 100%;
+            }
+            
+            .icon-selection {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
         <header>
-            <h1><i class="fas fa-boxes"></i> Basement Supply Inventory Tracker</h1>
+            <h1>Basement Supply Inventory Tracker</h1>
             <p class="subtitle">Secure shared inventory with team</p>
-            <div class="cloud-status" id="cloudStatus">
-                <i class="fas fa-cloud"></i>
-                <span id="statusText">Connecting...</span>
+            <div class="local-storage-badge">
+                <i class="fas fa-database"></i>
+                <span>Using local storage</span>
             </div>
         </header>
-        
-        <!-- Login Modal (if using API keys) -->
-        <div id="loginModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center;">
-            <div style="background: var(--dark-card); padding: 30px; border-radius: 12px; max-width: 400px; width: 90%; border: 1px solid var(--dark-border);">
-                <h2 style="color: var(--light); margin-bottom: 20px;"><i class="fas fa-lock"></i> Enter Access Code</h2>
-                <p style="color: var(--dark-text-secondary); margin-bottom: 20px;">Enter the access code provided by your manager:</p>
-                <input type="password" id="accessCode" placeholder="Enter access code" style="width: 100%; padding: 12px; margin-bottom: 20px; border-radius: 6px; border: 1px solid var(--dark-border); background: rgba(15, 23, 42, 0.5); color: var(--light);">
-                <div style="display: flex; gap: 10px;">
-                    <button onclick="checkAccessCode()" style="background: var(--primary); color: white; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; flex: 1;">Connect</button>
-                    <button onclick="useLocalMode()" style="background: var(--dark-border); color: var(--light); border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; flex: 1;">Use Local Mode</button>
+
+        <main class="inventory-section">
+            <div class="section-header">
+                <h2>Current Inventory</h2>
+                <div class="controls">
+                    <select id="categoryFilter">
+                        <option>All Categories</option>
+                        <option>Kitchen</option>
+                        <option>Cleaning</option>
+                        <option>Party Supplies</option>
+                        <option>Tools</option>
+                    </select>
+                    <select id="sortBy">
+                        <option>Sort by Name</option>
+                        <option>Sort by Date Added</option>
+                        <option>Sort by Category</option>
+                    </select>
                 </div>
             </div>
-        </div>
 
-        <!-- Main Content -->
-        <div class="inventory-container">
-            <!-- Left Panel - Inventory List -->
-            <div class="inventory-list">
-                <div class="category-filter">
-                    <h2 class="section-title">Current Inventory</h2>
-                    <div class="filter-controls">
-                        <select id="categoryFilter" onchange="filterByCategory()">
-                            <option value="all">All Categories</option>
-                            <option value="Dining">Dining Items</option>
-                            <option value="Packaging">Packaging</option>
-                            <option value="Cleaning">Cleaning Supplies</option>
-                            <option value="Storage">Storage</option>
-                            <option value="Other">Other</option>
-                        </select>
-                        <select id="sortFilter" onchange="sortInventory()">
-                            <option value="name">Sort by Name</option>
-                            <option value="quantity">Sort by Quantity</option>
-                            <option value="date">Sort by Date</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div id="inventoryItems">
-                    <!-- Items loaded here -->
-                </div>
-                
-                <div id="emptyState" class="empty-state">
-                    <i class="fas fa-clipboard-list"></i>
+            <div id="inventoryContainer">
+                <!-- Empty state shown initially -->
+                <div class="empty-state" id="emptyState">
+                    <i class="fas fa-box-open"></i>
                     <h3>No Items in Inventory</h3>
                     <p>Add your first item using the form</p>
                 </div>
-                
-                <div class="sync-controls">
-                    <button class="sync-btn" onclick="loadInventory()" id="syncBtn">
-                        <i class="fas fa-sync-alt"></i> Refresh
-                    </button>
-                    <button class="sync-btn warning" onclick="exportData()">
-                        <i class="fas fa-download"></i> Export
-                    </button>
-                </div>
+
+                <!-- Inventory items will appear here -->
+                <div id="inventoryItems" style="display: none;"></div>
             </div>
+
+            <div class="button-group">
+                <button class="btn btn-secondary" id="refreshBtn">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+                <button class="btn btn-primary" id="exportBtn">
+                    <i class="fas fa-file-export"></i> Export
+                </button>
+            </div>
+        </main>
+
+        <aside class="form-section">
+            <h2>Add New Item</h2>
             
-            <!-- Right Panel - Add/Edit Form -->
-            <div class="inventory-form">
-                <div class="form-title">
-                    <h2 class="section-title" id="formTitle">Add New Item</h2>
-                    <button type="button" class="clear-form" id="clearFormBtn" style="display: none;">
-                        <i class="fas fa-times"></i> Clear
-                    </button>
+            <form id="addItemForm">
+                <div class="form-group">
+                    <label for="itemName" class="required">Item Name</label>
+                    <input type="text" id="itemName" placeholder="e.g., Plastic Cups" required>
                 </div>
-                
-                <form id="addItemForm">
-                    <input type="hidden" id="itemId" value="">
-                    
-                    <div class="form-group">
-                        <label for="itemName">Item Name *</label>
-                        <input type="text" id="itemName" placeholder="e.g., Plastic Cups" required>
+
+                <div class="form-group">
+                    <label>Select Icon</label>
+                    <div class="icon-selection" id="iconSelection">
+                        <!-- Icons will be added by JavaScript -->
                     </div>
-                    
-                    <div class="form-group">
-                        <label for="itemIcon">Select Icon</label>
-                        <div class="icon-selector" id="iconSelector"></div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="itemCategory">Category *</label>
-                        <select id="itemCategory" required>
-                            <option value="">Select category</option>
-                            <option value="Dining">Dining Items</option>
-                            <option value="Packaging">Packaging</option>
-                            <option value="Cleaning">Cleaning Supplies</option>
-                            <option value="Storage">Storage</option>
-                            <option value="Other">Other</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="itemCode">Item Code *</label>
-                        <input type="text" id="itemCode" placeholder="e.g., CUP-001" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="itemQuantity">Quantity *</label>
-                        <input type="number" id="itemQuantity" min="0" value="1" required>
-                        <div class="quantity-controls">
-                            <button type="button" class="quantity-btn" onclick="adjustQuantity(-5)">-5</button>
-                            <button type="button" class="quantity-btn" onclick="adjustQuantity(-1)">-1</button>
-                            <span style="padding: 0 15px; font-weight: bold;">Qty</span>
-                            <button type="button" class="quantity-btn" onclick="adjustQuantity(1)">+1</button>
-                            <button type="button" class="quantity-btn" onclick="adjustQuantity(5)">+5</button>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="itemNotes">Notes</label>
-                        <textarea id="itemNotes" placeholder="Add notes..."></textarea>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Item Photo (Optional)</label>
-                        <div class="photo-section">
-                            <img id="photoPreview" class="photo-preview" alt="Photo preview">
-                            <div id="cameraControls">
-                                <button type="button" class="photo-btn" onclick="openMobileCamera()">
-                                    <i class="fas fa-camera"></i> Take Photo
-                                </button>
-                                <input type="file" id="mobileCameraInput" accept="image/*" capture="environment" style="display: none;" onchange="handleMobileCamera(event)">
-                                <button type="button" class="photo-btn secondary" onclick="document.getElementById('fileUpload').click()">
-                                    <i class="fas fa-upload"></i> Upload
-                                </button>
-                                <input type="file" id="fileUpload" accept="image/*" style="display: none;" onchange="handleFileUpload(event)">
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <button type="submit" class="add-btn" id="submitBtn">
-                        <i class="fas fa-plus-circle"></i> Add Item
-                    </button>
-                </form>
-            </div>
-        </div>
-        
-        <!-- Summary -->
-        <div class="summary">
-            <div class="summary-item">
-                <div class="summary-value" id="totalItems">0</div>
-                <div class="summary-label">Total Items</div>
-            </div>
-            <div class="summary-item">
-                <div class="summary-value" id="totalQuantity">0</div>
-                <div class="summary-label">Total Quantity</div>
-            </div>
-            <div class="summary-item">
-                <div class="summary-value" id="lowStockItems">0</div>
-                <div class="summary-label">Low Stock</div>
-            </div>
-        </div>
-        
-        <footer>
-            <p>Basement Supply Inventory Tracker &copy; 2025 | <span id="dataMode">Local Mode</span></p>
-        </footer>
+                </div>
+
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-plus-circle"></i> Add Item to Inventory
+                </button>
+            </form>
+        </aside>
     </div>
 
     <script>
-        // ==================== CONFIGURATION ====================
-        const API_BASE_URL = window.location.origin; // Auto-detect Netlify URL
-        let API_KEY = localStorage.getItem('inventory_api_key') || '';
-        let isOnlineMode = false;
-        let inventory = [];
-        let capturedPhoto = null;
+        // Inventory data structure
+        let inventory = JSON.parse(localStorage.getItem('inventory')) || [];
+        let selectedIcon = 'box';
 
-        // Available icons
-        const availableIcons = [
-            { name: "Mug", icon: "fa-mug-hot" },
-            { name: "Bowl", icon: "fa-bowl-food" },
-            { name: "Plate", icon: "fa-plate-wheat" },
-            { name: "Box", icon: "fa-box" },
-            { name: "Bag", icon: "fa-bag-shopping" },
-            { name: "Gloves", icon: "fa-hand" },
-            { name: "Tissue", icon: "fa-box-tissue" },
-            { name: "Bottle", icon: "fa-bottle-water" },
-            { name: "Utensils", icon: "fa-utensils" },
-            { name: "Trash", icon: "fa-trash" },
-            { name: "Spray", icon: "fa-spray-can" },
-            { name: "Soap", icon: "fa-pump-soap" }
+        // Icon options with FontAwesome classes
+        const iconOptions = [
+            { id: 'mug', name: 'Mug', icon: 'fas fa-mug-hot' },
+            { id: 'bowl', name: 'Bowl', icon: 'fas fa-bowl-food' },
+            { id: 'plate', name: 'Plate', icon: 'fas fa-plate-wheat' },
+            { id: 'box', name: 'Box', icon: 'fas fa-box' },
+            { id: 'bag', name: 'Bag', icon: 'fas fa-shopping-bag' },
+            { id: 'gloves', name: 'Gloves', icon: 'fas fa-hand-paper' },
+            { id: 'tissue', name: 'Tissue', icon: 'fas fa-toilet-paper' },
+            { id: 'bottle', name: 'Bottle', icon: 'fas fa-wine-bottle' },
+            { id: 'utensils', name: 'Utensils', icon: 'fas fa-utensils' }
         ];
 
-        // DOM Elements
-        const elements = {
-            inventoryItems: document.getElementById('inventoryItems'),
-            emptyState: document.getElementById('emptyState'),
-            totalItems: document.getElementById('totalItems'),
-            totalQuantity: document.getElementById('totalQuantity'),
-            lowStockItems: document.getElementById('lowStockItems'),
-            categoriesCount: document.getElementById('categoriesCount'),
-            formTitle: document.getElementById('formTitle'),
-            submitBtn: document.getElementById('submitBtn'),
-            clearFormBtn: document.getElementById('clearFormBtn'),
-            itemIdInput: document.getElementById('itemId'),
-            statusText: document.getElementById('statusText'),
-            cloudStatus: document.getElementById('cloudStatus'),
-            loginModal: document.getElementById('loginModal'),
-            dataMode: document.getElementById('dataMode')
-        };
-
-        // ==================== INITIALIZATION ====================
+        // Initialize the page
         document.addEventListener('DOMContentLoaded', function() {
-            // Setup icon selector
-            renderIconSelector();
-            
-            // Check if we have API key
-            if (API_KEY) {
-                // Test connection
-                testConnection();
-            } else {
-                // Show login modal
-                elements.loginModal.style.display = 'flex';
-            }
-            
-            // Load data
-            loadData();
-            
-            // Setup form
-            setupForm();
-            
-            // Auto-refresh every 30 seconds if online
-            setInterval(() => {
-                if (isOnlineMode) loadInventory();
-            }, 30000);
+            // Create icon selection options
+            const iconSelection = document.getElementById('iconSelection');
+            iconOptions.forEach(icon => {
+                const iconOption = document.createElement('div');
+                iconOption.className = `icon-option ${icon.id === selectedIcon ? 'selected' : ''}`;
+                iconOption.dataset.icon = icon.id;
+                iconOption.innerHTML = `
+                    <i class="${icon.icon}"></i>
+                    <span>${icon.name}</span>
+                `;
+                iconOption.addEventListener('click', () => selectIcon(icon.id));
+                iconSelection.appendChild(iconOption);
+            });
+
+            // Load existing inventory
+            loadInventory();
+
+            // Form submission
+            document.getElementById('addItemForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                addItem();
+            });
+
+            // Button events
+            document.getElementById('refreshBtn').addEventListener('click', loadInventory);
+            document.getElementById('exportBtn').addEventListener('click', exportInventory);
+
+            // Filter and sort events
+            document.getElementById('categoryFilter').addEventListener('change', loadInventory);
+            document.getElementById('sortBy').addEventListener('change', loadInventory);
         });
 
-        // ==================== API FUNCTIONS ====================
-        async function apiRequest(endpoint, method = 'GET', data = null) {
-            const headers = {
-                'Content-Type': 'application/json',
-            };
-            
-            if (API_KEY) {
-                headers['x-api-key'] = API_KEY;
-            }
-            
-            const options = {
-                method,
-                headers,
-            };
-            
-            if (data && (method === 'POST' || method === 'PUT' || method === 'DELETE')) {
-                options.body = JSON.stringify(data);
-            }
-            
-            try {
-                // Use Netlify Functions endpoint
-                const response = await fetch(`${API_BASE_URL}/.netlify/functions/inventory`, options);
-                
-                if (response.status === 401) {
-                    // Invalid API key
-                    localStorage.removeItem('inventory_api_key');
-                    API_KEY = '';
-                    elements.loginModal.style.display = 'flex';
-                    throw new Error('Invalid access code');
+        // Select an icon
+        function selectIcon(iconId) {
+            selectedIcon = iconId;
+            document.querySelectorAll('.icon-option').forEach(option => {
+                option.classList.remove('selected');
+                if (option.dataset.icon === iconId) {
+                    option.classList.add('selected');
                 }
-                
-                return await response.json();
-            } catch (error) {
-                console.error('API error:', error);
-                throw error;
-            }
+            });
         }
 
-        async function testConnection() {
-            try {
-                updateStatus('Testing connection...', 'warning');
-                const result = await apiRequest('inventory', 'GET');
-                
-                if (result.success) {
-                    isOnlineMode = true;
-                    updateStatus('Connected to shared database', 'success');
-                    elements.dataMode.textContent = 'Online Mode';
-                } else {
-                    throw new Error('Connection failed');
-                }
-            } catch (error) {
-                isOnlineMode = false;
-                updateStatus('Using local storage', 'warning');
-                elements.dataMode.textContent = 'Local Mode';
-            }
-        }
-
-        async function loadInventory() {
-            if (!isOnlineMode) {
-                loadLocalData();
+        // Add new item
+        function addItem() {
+            const itemName = document.getElementById('itemName').value.trim();
+            if (!itemName) {
+                alert('Please enter an item name');
                 return;
             }
+
+            const newItem = {
+                id: Date.now(),
+                name: itemName,
+                icon: selectedIcon,
+                category: 'Uncategorized',
+                dateAdded: new Date().toISOString().split('T')[0]
+            };
+
+            inventory.unshift(newItem);
+            saveInventory();
+            loadInventory();
             
-            try {
-                const result = await apiRequest('inventory', 'GET');
+            // Reset form
+            document.getElementById('addItemForm').reset();
+            selectIcon('box'); // Reset to default icon
+        }
+
+        // Load inventory items
+        function loadInventory() {
+            const inventoryItems = document.getElementById('inventoryItems');
+            const emptyState = document.getElementById('emptyState');
+            
+            // Apply filters and sorting
+            let filteredItems = [...inventory];
+            const categoryFilter = document.getElementById('categoryFilter').value;
+            const sortBy = document.getElementById('sortBy').value;
+            
+            if (categoryFilter !== 'All Categories') {
+                filteredItems = filteredItems.filter(item => item.category === categoryFilter);
+            }
+            
+            if (sortBy === 'Sort by Name') {
+                filteredItems.sort((a, b) => a.name.localeCompare(b.name));
+            } else if (sortBy === 'Sort by Date Added') {
+                filteredItems.sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded));
+            }
+            
+            // Display items or empty state
+            if (filteredItems.length > 0) {
+                emptyState.style.display = 'none';
+                inventoryItems.style.display = 'block';
                 
-                if (result.success) {
-                    inventory = result.inventory.map(item => ({
-                        id: item.id,
-                        name: item.name,
-                        icon: item.icon,
-                        category: item.category,
-                        code: item.code,
-                        quantity: item.quantity,
-                        notes: item.notes,
-                        photo: item.photo,
-                        lastUpdated: item.last_updated
-                    }));
-                    
-                    // Backup to localStorage
-                    saveLocalData();
-                    
-                    renderInventory();
-                    updateSummary();
-                }
-            } catch (error) {
-                console.error('Load error:', error);
-                loadLocalData();
-            }
-        }
-
-        async function saveItem(item) {
-            if (!isOnlineMode) {
-                // Save locally
-                if (item.id) {
-                    const index = inventory.findIndex(i => i.id === item.id);
-                    if (index !== -1) inventory[index] = item;
-                } else {
-                    item.id = Date.now();
-                    inventory.push(item);
-                }
-                saveLocalData();
-                renderInventory();
-                updateSummary();
-                showToast('Saved locally', 'success');
-                return true;
-            }
-            
-            try {
-                let result;
-                
-                if (item.id && typeof item.id === 'number' && item.id > 1000) {
-                    // This is a local ID (timestamp), create new
-                    delete item.id;
-                    result = await apiRequest('inventory', 'POST', item);
-                } else if (item.id) {
-                    // Update existing
-                    result = await apiRequest('inventory', 'PUT', item);
-                } else {
-                    // Create new
-                    result = await apiRequest('inventory', 'POST', item);
-                }
-                
-                if (result.success) {
-                    await loadInventory(); // Reload from server
-                    showToast('Saved to shared database', 'success');
-                    return true;
-                }
-            } catch (error) {
-                console.error('Save error:', error);
-                showToast('Saved locally (offline)', 'warning');
-                
-                // Save locally as fallback
-                if (item.id) {
-                    const index = inventory.findIndex(i => i.id === item.id);
-                    if (index !== -1) inventory[index] = item;
-                } else {
-                    item.id = Date.now();
-                    inventory.push(item);
-                }
-                saveLocalData();
-                renderInventory();
-                updateSummary();
-            }
-            
-            return false;
-        }
-
-        async function deleteItem(id) {
-            if (!confirm('Delete this item?')) return;
-            
-            if (!isOnlineMode) {
-                inventory = inventory.filter(item => item.id !== id);
-                saveLocalData();
-                renderInventory();
-                updateSummary();
-                showToast('Deleted locally', 'success');
-                return;
-            }
-            
-            try {
-                const result = await apiRequest('inventory', 'DELETE', { id });
-                
-                if (result.success) {
-                    await loadInventory();
-                    showToast('Deleted from shared database', 'success');
-                }
-            } catch (error) {
-                console.error('Delete error:', error);
-                showToast('Deleted locally (offline)', 'warning');
-                
-                // Delete locally
-                inventory = inventory.filter(item => item.id !== id);
-                saveLocalData();
-                renderInventory();
-                updateSummary();
-            }
-        }
-
-        // ==================== LOCAL STORAGE ====================
-        function loadLocalData() {
-            const saved = localStorage.getItem('inventory_local');
-            if (saved) {
-                try {
-                    inventory = JSON.parse(saved);
-                    renderInventory();
-                    updateSummary();
-                } catch (e) {
-                    console.error('Load local error:', e);
-                    inventory = [];
-                }
-            }
-        }
-
-        function saveLocalData() {
-            try {
-                localStorage.setItem('inventory_local', JSON.stringify(inventory));
-            } catch (e) {
-                console.error('Save local error:', e);
-            }
-        }
-
-        // ==================== AUTHENTICATION ====================
-        function checkAccessCode() {
-            const code = document.getElementById('accessCode').value;
-            
-            if (code) {
-                API_KEY = code;
-                localStorage.setItem('inventory_api_key', code);
-                elements.loginModal.style.display = 'none';
-                testConnection();
-                loadInventory();
-            }
-        }
-
-        function useLocalMode() {
-            elements.loginModal.style.display = 'none';
-            isOnlineMode = false;
-            updateStatus('Using local storage', 'warning');
-            elements.dataMode.textContent = 'Local Mode';
-            loadLocalData();
-        }
-
-        // ==================== UI FUNCTIONS ====================
-        function updateStatus(message, type) {
-            elements.statusText.textContent = message;
-            elements.cloudStatus.className = 'cloud-status';
-            
-            if (type === 'success') {
-                elements.cloudStatus.classList.add('status-connected');
-            } else if (type === 'warning') {
-                elements.cloudStatus.classList.add('status-disconnected');
-            }
-        }
-
-        function showToast(message, type = 'info') {
-            const toast = document.createElement('div');
-            toast.className = 'toast';
-            toast.innerHTML = `
-                <i class="fas fa-${type === 'success' ? 'check-circle' : 'info-circle'}"></i>
-                <span>${message}</span>
-            `;
-            
-            document.body.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.remove();
-            }, 3000);
-        }
-
-        function renderIconSelector() {
-            const container = document.getElementById('iconSelector');
-            container.innerHTML = '';
-            
-            availableIcons.forEach(icon => {
-                const div = document.createElement('div');
-                div.className = 'icon-option';
-                div.dataset.icon = icon.icon;
-                div.innerHTML = `<i class="fas ${icon.icon}"></i><span>${icon.name}</span>`;
-                
-                div.addEventListener('click', function() {
-                    document.querySelectorAll('.icon-option').forEach(opt => {
-                        opt.classList.remove('selected');
-                    });
-                    this.classList.add('selected');
+                let itemsHTML = '';
+                filteredItems.forEach(item => {
+                    const iconInfo = iconOptions.find(icon => icon.id === item.icon);
+                    itemsHTML += `
+                        <div class="item-row" data-id="${item.id}">
+                            <div class="item-icon">
+                                <i class="${iconInfo.icon}"></i>
+                            </div>
+                            <div class="item-details">
+                                <div class="item-name">${item.name}</div>
+                                <div class="item-category">${item.category} • Added ${item.dateAdded}</div>
+                            </div>
+                            <div class="item-actions">
+                                <button class="action-btn" onclick="editItem(${item.id})" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="action-btn" onclick="deleteItem(${item.id})" title="Delete">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
                 });
                 
-                container.appendChild(div);
-            });
-            
-            // Select first icon
-            if (container.firstChild) {
-                container.firstChild.classList.add('selected');
-            }
-        }
-
-        function setupForm() {
-            document.getElementById('addItemForm').addEventListener('submit', async function(e) {
-                e.preventDefault();
-                
-                const itemId = parseInt(elements.itemIdInput.value) || 0;
-                const itemName = document.getElementById('itemName').value;
-                const itemIcon = document.querySelector('.icon-option.selected')?.dataset.icon || 'fa-box';
-                const itemCategory = document.getElementById('itemCategory').value;
-                const itemCode = document.getElementById('itemCode').value;
-                const itemQuantity = parseInt(document.getElementById('itemQuantity').value) || 0;
-                const itemNotes = document.getElementById('itemNotes').value;
-                
-                if (!itemName || !itemCategory || !itemCode) {
-                    showToast('Please fill required fields', 'danger');
-                    return;
-                }
-                
-                const item = {
-                    id: itemId,
-                    name: itemName,
-                    icon: itemIcon,
-                    category: itemCategory,
-                    code: itemCode,
-                    quantity: itemQuantity,
-                    notes: itemNotes,
-                    photo: capturedPhoto,
-                    lastUpdated: new Date().toISOString()
-                };
-                
-                await saveItem(item);
-                resetForm();
-            });
-            
-            elements.clearFormBtn.addEventListener('click', resetForm);
-        }
-
-        function renderInventory() {
-            // ... (same as before)
-        }
-
-        function editItem(id) {
-            // ... (same as before)
-        }
-
-        function resetForm() {
-            // ... (same as before)
-        }
-
-        function updateSummary() {
-            // ... (same as before)
-        }
-
-        // ==================== UTILITY FUNCTIONS ====================
-        function loadData() {
-            if (isOnlineMode) {
-                loadInventory();
+                inventoryItems.innerHTML = itemsHTML;
             } else {
-                loadLocalData();
+                emptyState.style.display = 'block';
+                inventoryItems.style.display = 'none';
             }
         }
 
-        function exportData() {
-            const data = {
-                version: '1.0',
-                exportDate: new Date().toISOString(),
-                inventory: inventory
-            };
+        // Edit item (placeholder function)
+        function editItem(id) {
+            const item = inventory.find(item => item.id === id);
+            if (item) {
+                document.getElementById('itemName').value = item.name;
+                selectIcon(item.icon);
+                deleteItem(id); // Remove old item (will be re-added when form is submitted)
+            }
+        }
+
+        // Delete item
+        function deleteItem(id) {
+            if (confirm('Are you sure you want to delete this item?')) {
+                inventory = inventory.filter(item => item.id !== id);
+                saveInventory();
+                loadInventory();
+            }
+        }
+
+        // Save inventory to local storage
+        function saveInventory() {
+            localStorage.setItem('inventory', JSON.stringify(inventory));
+        }
+
+        // Export inventory
+        function exportInventory() {
+            if (inventory.length === 0) {
+                alert('No items to export');
+                return;
+            }
             
-            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `inventory-backup-${new Date().toISOString().split('T')[0]}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
+            const dataStr = JSON.stringify(inventory, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            const exportFileDefaultName = `inventory-${new Date().toISOString().split('T')[0]}.json`;
             
-            showToast('Backup exported', 'success');
-        }
-
-        // Camera functions (same as before)
-        function openMobileCamera() {
-            document.getElementById('mobileCameraInput').click();
-        }
-
-        function handleMobileCamera(event) {
-            // ... (same as before)
-        }
-
-        function handleFileUpload(event) {
-            // ... (same as before)
-        }
-
-        function adjustQuantity(change) {
-            const input = document.getElementById('itemQuantity');
-            input.value = Math.max(0, parseInt(input.value || 0) + change);
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
         }
     </script>
 </body>
