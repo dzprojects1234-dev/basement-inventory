@@ -1,27 +1,18 @@
-// Netlify Function for inventory storage
-const fs = require('fs');
-const path = require('path');
+const { createClient } = require('@supabase/supabase-js');
+const { authenticateRequest } = require('./auth');
 
-// Path to JSON file storage
-const DATA_FILE = path.join(process.cwd(), 'data', 'inventory.json');
+// Initialize Supabase with service role (server-side only)
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;
 
-// Ensure data directory exists
-const dataDir = path.join(process.cwd(), 'data');
-if (!fs.existsSync(dataDir)) {
-  fs.mkdirSync(dataDir, { recursive: true });
-}
-
-// Initialize empty data file if it doesn't exist
-if (!fs.existsSync(DATA_FILE)) {
-  fs.writeFileSync(DATA_FILE, JSON.stringify({ inventory: [] }));
-}
+const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 exports.handler = async function(event, context) {
-  // Enable CORS
+  // CORS headers
   const headers = {
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, x-api-key',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
     'Content-Type': 'application/json',
   };
 
@@ -34,39 +25,142 @@ exports.handler = async function(event, context) {
     };
   }
 
+  // Authenticate request
+  const auth = authenticateRequest(event);
+  if (!auth.authenticated) {
+    return {
+      statusCode: 401,
+      headers,
+      body: JSON.stringify({ error: auth.error || 'Unauthorized' }),
+    };
+  }
+
   try {
+    // GET - Fetch all items
     if (event.httpMethod === 'GET') {
-      // Read data from file
-      const data = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
-      return {
-        statusCode: 200,
-        headers,
-        body: JSON.stringify({ success: true, inventory: data.inventory }),
-      };
-    }
+      const { data, error } = await supabase
+        .from('inventory')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-    if (event.httpMethod === 'POST') {
-      // Parse incoming data
-      const incomingData = JSON.parse(event.body);
-      
-      // Validate data
-      if (!incomingData.inventory || !Array.isArray(incomingData.inventory)) {
-        throw new Error('Invalid data format');
-      }
-
-      // Save to file
-      fs.writeFileSync(DATA_FILE, JSON.stringify({
-        inventory: incomingData.inventory,
-        lastUpdated: new Date().toISOString(),
-      }));
+      if (error) throw error;
 
       return {
         statusCode: 200,
         headers,
         body: JSON.stringify({ 
           success: true, 
-          message: `Saved ${incomingData.inventory.length} items`,
-          count: incomingData.inventory.length 
+          inventory: data,
+          count: data.length 
+        }),
+      };
+    }
+
+    // POST - Create new item
+    if (event.httpMethod === 'POST') {
+      const item = JSON.parse(event.body);
+      
+      // Validate required fields
+      if (!item.name || !item.category || !item.code) {
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({ error: 'Missing required fields' }),
+        };
+      }
+
+      const { data, error } = await supabase
+        .from('inventory')
+        .insert([{
+          name: item.name,
+          icon: item.icon || 'fa-box',
+          category: item.category,
+          code: item.code,
+          quantity: item.quantity || 0,
+          notes: item.notes || '',
+          photo: item.photo || null,
+          last_updated: new Date().toISOString()
+        }])
+        .select();
+
+      if (error) throw error;
+
+      return {
+        statusCode: 201,
+        headers,
+        body: JSON.stringify({ 
+          success: true, 
+          item: data[0],
+          message: 'Item created successfully' 
+        }),
+      };
+    }
+
+    // PUT - Update item
+    if (event.httpMethod === 'PUT') {
+      const item = JSON.parse(event.body);
+      
+      if (!item.id) {
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({ error: 'Item ID required' }),
+        };
+      }
+
+      const { data, error } = await supabase
+        .from('inventory')
+        .update({
+          name: item.name,
+          icon: item.icon,
+          category: item.category,
+          code: item.code,
+          quantity: item.quantity,
+          notes: item.notes,
+          photo: item.photo,
+          last_updated: new Date().toISOString()
+        })
+        .eq('id', item.id)
+        .select();
+
+      if (error) throw error;
+
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({ 
+          success: true, 
+          item: data[0],
+          message: 'Item updated successfully' 
+        }),
+      };
+    }
+
+    // DELETE - Remove item
+    if (event.httpMethod === 'DELETE') {
+      const { id } = JSON.parse(event.body);
+      
+      if (!id) {
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({ error: 'Item ID required' }),
+        };
+      }
+
+      const { error } = await supabase
+        .from('inventory')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({ 
+          success: true, 
+          message: 'Item deleted successfully' 
         }),
       };
     }
@@ -74,16 +168,16 @@ exports.handler = async function(event, context) {
     return {
       statusCode: 405,
       headers,
-      body: JSON.stringify({ success: false, message: 'Method not allowed' }),
+      body: JSON.stringify({ error: 'Method not allowed' }),
     };
+
   } catch (error) {
     console.error('Error:', error);
     return {
       statusCode: 500,
       headers,
       body: JSON.stringify({ 
-        success: false, 
-        message: error.message || 'Internal server error' 
+        error: error.message || 'Internal server error' 
       }),
     };
   }
